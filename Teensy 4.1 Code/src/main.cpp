@@ -1,18 +1,28 @@
 #include <Arduino.h>
+#include "chassis/odom.hpp"
+#include "devices/drive.hpp"
 
-// put function declarations here:
-int myFunction(int, int);
+Drive drive_l(10, 11);
+Drive drive_r(12, 13);
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+
+  Serial.begin(115200);
+  while (!Serial) {
+    ;
+  }
+  delay(100 ); 
+
+  drive_l.setup();
+  drive_r.setup();
+  odom.start();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
+  while (true){
+    Pose pos = odom.getPose();
+    Serial.printf("Odom | %8.3f %8.3f %8.3f\n", pos.x, pos.y, radToDeg(pos.a));
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+    delay(10);
+  }
 }
