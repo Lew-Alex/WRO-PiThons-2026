@@ -1,0 +1,71 @@
+
+void scoreLowGoal(){
+    lever.changeState(LeverIdle{});
+    intake.changeState(IntakeIdle{});
+
+    moveDrive(60, 0);
+
+    delay(200);
+    Position reset_pose = tracking.position;
+    cout<<"Tracking reset\n";
+
+    moveDrive(-20, 0);
+
+    WAIT_UNTIL((reset_pose - tracking.position).getMagnitude() > 1.0);
+    harshBrakeVel();
+
+    
+    Timer lowgoal{"lowgoal"};
+
+    intk_p.setState(HIGH);
+
+    
+    intk_m.move_velocity(-90);
+    intk_sensor.set_led_pwm(100);
+
+    btm_mag_sensor.setThreshold(110);
+    int stall_count = 0;
+    while (btm_mag_sensor.visibleFor() > 20){
+        if (fabs(intk_m.get_actual_velocity()) < 5){
+            stall_count += 1;
+        } else if (stall_count != 0){
+            stall_count = 0;
+        }
+
+        if (stall_count > 5){
+            stall_count = 0;
+            intk_p.setState(LOW);
+            delay(200);
+            intk_p.setState(HIGH);
+        }
+
+        delay(10);
+    }
+    intk_p.setState(HIGH);
+    intk_m.move_velocity(-60);
+
+
+    int count = 0;
+    while (count < 2) {
+        if (intk_sensor.get_proximity() < 200){
+            count += 1;
+        } else if (count != 0){
+            count = 0;
+        }
+
+        delay(33);
+    }
+
+    
+
+
+    moveDrive(-40, 0.0);
+    
+
+    delay(300);
+
+    intk_m.brake();
+    moveDrive(0, 0);
+    intk_p.setState(LOW);
+
+}

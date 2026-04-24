@@ -1,0 +1,28 @@
+#include <Arduino.h>
+#include "config.hpp"
+#include "run.hpp"
+
+
+
+void setup() {
+    Serial.begin(9600);
+    delay(500); // allow time to open serial monitor
+    imu2.calibrateGyro();
+    Serial.println("SETUP HERE");
+}
+
+bool running = true;
+void loop() {
+
+    if (running){
+        running = false;
+
+        // Run auto in a task
+        // startAuto();
+    }
+    // parallelWheel.update();
+    
+    Serial.println(imu2.getHeadingDeg());
+
+    delay(10);
+}

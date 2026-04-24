@@ -14,32 +14,28 @@ bool IMU::init() {
         Serial.println("IMU initialization failed!");
         return false;
     }
-    lastTime = millis();
+    lastTime = micros();
     return true;
 }
 
 void IMU::calibrateGyro(int samples, int delayMS) {
-    Serial.println("Calibrating gyro... keep IMU still.");
-    long sum = 0;
+    float sum = 0;
     for (int i = 0; i < samples; i++) {
-        sum += imu.readRawGyroZ();
+        sum += imu.readFloatGyroZ();
         delay(delayMS);
     }
-    gyroZOffset = sum / (float)samples;
-    Serial.print("Gyro Z offset (raw LSB): ");
-    Serial.println(gyroZOffset, 3);
+    gyroZOffset = sum / samples;
 }
 
 void IMU::update() {
-    unsigned long now = millis();
-    float dt = (now - lastTime) / 1000.0;
+    unsigned long now = micros();
+    float dt = (now - lastTime) / 1000000.0;
     lastTime = now;
 
-    float gz_raw = imu.readRawGyroZ();
-    float gz_dps = (gz_raw - gyroZOffset) * 0.07; // convert LSB -> deg/sec
-    headingAngle += gz_dps * dt;
+    float gz_dps = imu.readFloatGyroZ() - gyroZOffset;
 
-    prevHeadingAngle = headingAngle - gz_dps * dt; // store previous for delta
+    prevHeadingAngle = headingAngle;
+    headingAngle += gz_dps * dt;
 }
 
 void IMU::reset(){

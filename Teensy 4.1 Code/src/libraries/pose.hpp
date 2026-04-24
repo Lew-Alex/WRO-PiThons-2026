@@ -9,8 +9,8 @@ struct Pose {
 
     // Constructors
     Pose();
-    Pose(double x, double y, double a);
-    Pose(Vector v, double a);
+    Pose(double x, double y, double a = 0.0);
+    Pose(Vector v, double a = 0.0);
 
     // Arithmetic operators
     Pose operator+(const Pose& rhs) const;
